@@ -116,5 +116,5 @@ def parse(file_path, o_post):
 if __name__ == "__main__":
     #parse_Interval('Interval(13.63000, 13.78000, ah0)')
     #parse_textgrid("D:/dataset/aligned_output/ST-CMDS-20170001_1-OS/20170001P00001A0001.TextGrid")
-    #print(parse_textgrid_line("D:/dataset/aligned_output/ST-CMDS-20170001_1-OS/20170001P00001A0001.TextGrid"))
-    parse("D:/dataset/aligned_output/ST-CMDS-20170001_1-OS","TextGrid")
+    print(parse_textgrid_line("/media/mungo/新加卷/ST-CMDS-20170001_1-OS/20170001P00444A0120.TextGrid"))
+    #parse("D:/dataset/aligned_output/ST-CMDS-20170001_1-OS","TextGrid")

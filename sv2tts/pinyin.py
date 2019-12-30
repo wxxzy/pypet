@@ -72,6 +72,7 @@ def get_contends(path):
     return contends
     
 def find_file(file_path, o_post):
+    path = '/home/mungo/sv2tts'
     ls = os.listdir(file_path)
     for i in ls:
         son_path = os.path.join(file_path,i)
@@ -92,14 +93,18 @@ def find_file(file_path, o_post):
                 for word in words:
                     pinyin = pinyin + ''.join(yinjie(word).replace(' ','')) + " "
                     hanzi = hanzi + ''.join(word) + " "
-                print(pinyin)
+
                 filename = str(son_path.split('.')[0])+'.lab'
-                print(filename)
-                with open(filename, 'a', encoding='UTF-8') as file_object:
-                    contends = file_object.write(pinyin)
+                #filename_cn = str(son_path.split('.')[0])+'.lab'
+
+                with open(filename, 'w', encoding='UTF-8') as file_object:
+                    file_object.write(pinyin)
+
+                #with open(filename_cn, 'a', encoding='UTF-8') as file_object:
+                #   file_object.write(hanzi)
                
 
-datasets_root = "D:/dataset/ST-CMDS-20170001_1-OS"
+datasets_root = "/media/mungo/新加卷/ST-CMDS-20170001_1-OS"
 
 if __name__ == "__main__":
     #print(pinyin("忠厚传家久"))
