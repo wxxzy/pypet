@@ -1,4 +1,5 @@
 import sounddevice as sd
+from pathlib import Path
 import numpy as np
 import librosa
 import os
@@ -7,12 +8,14 @@ import os
 # utterances of the dataset, split utterances on silences that are longer 0.4s and play them.
 # (this does not change your files)
 
-librispeech_root = "D:/dataset/ST-CMDS-20170001_1-OS"    # Replace with yours
+librispeech_root = "D:/dataset/ST-CMDS-20170001_1-OS"   # Replace with yours
 
 def split_on_silences(audio_fpath, words, end_times):
+    if not audio_fpath.exists():
+        return
     # Load the audio waveform
     sample_rate = 16000     # Sampling rate of LibriSpeech 
-    wav, _ = librosa.load(audio_fpath, sample_rate)
+    wav, _ = librosa.load(str(audio_fpath.absolute()), sample_rate)
     
     words = np.array(words)
     start_times = np.array([0.0] + end_times[:-1])
@@ -46,38 +49,18 @@ def split_on_silences(audio_fpath, words, end_times):
     return wavs, texts
 
 if __name__ == '__main__':
-    # Select sets (e.g. dev-clean, train-other-500, ...)
-    for set_name in os.listdir(librispeech_root):
-        set_dir = os.path.join(librispeech_root, set_name)
-        if not os.path.isdir(set_dir):
-            continue
-        
-        # Select speakers
-        for speaker_id in os.listdir(set_dir):
-            speaker_dir = os.path.join(set_dir, speaker_id)
-            
-            # Select books
-            for book_id in os.listdir(speaker_dir):
-                book_dir = os.path.join(speaker_dir, book_id)
-                
-                # Get the alignment file
-                alignment_fpath = os.path.join(book_dir, "%s-%s.alignment.txt" % 
-                                               (speaker_id, book_id))
-                if not os.path.exists(alignment_fpath):
-                    raise Exception("Alignment file not found. Did you download and merge the txt "
-                                    "alignments with your LibriSpeech dataset?")
-                
-                # Parse each utterance present in the file
-                alignment_file = open(alignment_fpath, "r")
-                for line in alignment_file:
-                    
-                    # Retrieve the utterance id, the words as a list and the end_times as a list
-                    utterance_id, words, end_times = line.strip().split(' ')
-                    words = words.replace('\"', '').split(',')
-                    end_times = [float(e) for e in end_times.replace('\"', '').split(',')]
-                    audio_fpath = os.path.join(book_dir, utterance_id + '.wav')
-                    
-                    # Split utterances on silences
-                    wavs, texts = split_on_silences(audio_fpath, words, end_times)
-                    
-                alignment_file.close()
+    data_root = Path(librispeech_root)
+    speaker_dirs = data_root.glob("*.metadata")
+    alignment_fpath = data_root.joinpath("ST-CMDS.alignment.txt")
+    if not os.path.exists(alignment_fpath):
+        raise Exception("Alignment file not found. Did you download and merge the txt "
+                        "alignments with your LibriSpeech dataset?")
+    alignment_file = open(alignment_fpath, "r")
+    for line in alignment_file:
+        utterance_id, words, end_times = line.strip().split(' ')
+        words = words.replace('\"', '').split(',')
+        end_times = [float(e) for e in end_times.replace('\"', '').split(',')]
+        audio_fpath = data_root.joinpath(utterance_id + '.wav')
+        # Split utterances on silences
+        wavs, texts = split_on_silences(audio_fpath, words, end_times)
+    alignment_file.close()
